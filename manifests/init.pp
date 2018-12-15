@@ -515,6 +515,19 @@ class auditd (
     }
   }
 
+  if $::operatingsystem == 'Ubuntu' and $::operatingsystemrelease == '16.04' {
+    exec { 'augenrules-load':
+      command     => '/sbin/augenrules --load',
+      refreshonly => true,
+      before      => Service['auditd'],
+      subscribe   => [
+        File['/etc/audit/auditd.conf'],
+        File['/etc/audisp/audispd.conf'],
+        Concat[$rules_file],
+      ]
+    }
+  }
+
   # Manage the service
   if $manage_service {
     service { 'auditd':
